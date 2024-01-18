@@ -1,0 +1,65 @@
+import random
+import math
+
+class Solution:
+    def __init__(self, CVRMSE, configuration):
+        self.CVRMSE = CVRMSE
+        self.config = configuration
+
+# Function prototype
+def gen_rand_sol():
+    a = [1, 2, 3, 4, 5]
+    return Solution(-1.0, a)
+
+# global variables
+T = 1
+Tmin = 0.0001
+alpha = 0.9
+num_iterations = 100
+M = 5
+N = 5
+source_array = [['X' for _ in range(N)] for _ in range(M)]
+temp = []
+mini = Solution(float('inf'), temp)
+current_sol = gen_rand_sol()
+
+def neighbor(current_sol):
+    return current_sol
+
+def cost(input_configuration):
+    return -1.0
+
+# Mapping from [0, M*N] --> [0, M]x[0, N]
+def index_to_points(index):
+    return [index % M, index // M]
+
+# Returns minimum value based on optimization
+while T > Tmin:
+    for _ in range(num_iterations):
+        # Reassigns global minimum accordingly
+        if current_sol.CVRMSE < mini.CVRMSE:
+            mini = current_sol
+        new_sol = neighbor(current_sol)
+        ap = math.exp((current_sol.CVRMSE - new_sol.CVRMSE) / T)
+        if ap > random.random():
+            current_sol = new_sol
+    T *= alpha  # Decreases T, cooling phase
+
+print(mini.CVRMSE, "\n")
+
+for i in range(M):
+    for j in range(N):
+        source_array[i][j] = 'X'
+
+# Displays
+for obj in mini.config:
+    coord = index_to_points(obj)
+    source_array[coord[0]][coord[1]] = '-'
+
+
+# Displays optimal location
+for i in range(M):
+    row = ""
+    for j in range(N):
+        row += source_array[i][j] + " "
+    print(row)
